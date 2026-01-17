@@ -1,0 +1,14 @@
+{
+    "version": "0.2",
+    "words": ["autofix", "Combi", "Lifmunk", "Paldex", "Waza", "Zukan"],
+    "ignorePaths": ["package.json", "package-lock.json"],
+    "useGitignore": true,
+    "validateDirectives": true,
+    "maxFileSize": 1000000,
+    "cache": {
+        "useCache": true,
+        "cacheLocation": "./node_modules/.cache/cspell/.cspell"
+    },
+    "language": "en",
+    "dictionaries": ["html", "typescript", "css", "en-gb", "fonts", "npm"]
+}
