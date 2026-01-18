@@ -11,7 +11,7 @@ export type MinimumSpheres = Record<string, number>;
 const gameSettingsObject = gameSettings.find((entry) => entry.Type === "BP_PalGameSetting_C")!;
 const captureJudgeArray = gameSettingsObject.Properties!.CaptureJudgeRateArray;
 const sphereArray = gameSettingsObject.Properties!.CaptureSphereLevelMap;
-const maxWildPalLevel = Object.values(wildPalsStats[0].Rows)
+export const maxWildPalLevel = Object.values(wildPalsStats[0].Rows)
     .map((item) => Math.max(item.LvMax_1, item.LvMax_2, item.LvMax_3))
     .sort((a, b) => b - a)[0];
 
@@ -24,7 +24,7 @@ export function getMaxPalLevelForSpheres(options: {
     isBack: boolean;
 }): MinimumSpheres {
     const maxLevelForSpheres = sphereArray.reduce<MinimumSpheres>((acc, cur) => {
-        acc[cur.Key.split("::")[1]] = 1;
+        acc[cur.Key.split("::")[1]] = 0;
         return acc;
     }, {});
     for (let palLevel = 1; palLevel <= maxWildPalLevel; palLevel++) {

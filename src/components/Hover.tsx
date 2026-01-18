@@ -7,6 +7,7 @@ import { noop } from "~/utils/noop";
 type HoverProps = {
     label: JSXElement;
     children: JSXElement;
+    clickOnly?: boolean;
 };
 
 export function Hover(props: HoverProps): JSXElement {
@@ -41,12 +42,12 @@ export function Hover(props: HoverProps): JSXElement {
                 ref={anchorRef}
                 class="link-button"
                 onMouseEnter={() => {
-                    if (showHover() === false) {
+                    if (showHover() === false && props.clickOnly !== true) {
                         setShowHover(true);
                     }
                 }}
                 onMouseLeave={() => {
-                    if (showHover() === true) {
+                    if (showHover() === true && props.clickOnly !== true) {
                         setShowHover(false);
                     }
                 }}

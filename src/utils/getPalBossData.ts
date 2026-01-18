@@ -1,10 +1,10 @@
 import basicPalData from "~/raw_data/DT_PalMonsterParameter.json";
 import type { PalMonsterParameter } from "~/types/PalMonsterParameter";
+import { convertDataTableType } from "./convertDataTableType";
 
-const dataRows = basicPalData[0].Rows;
+const dataRows = convertDataTableType(basicPalData);
 
 export function getPalBossData(palId: string): PalMonsterParameter {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- It may not exist
-    const data = dataRows[`BOSS_${palId}` as keyof typeof dataRows] ?? dataRows[palId as keyof typeof dataRows];
+    const data = dataRows[`BOSS_${palId}`] ?? dataRows[palId];
     return data;
 }

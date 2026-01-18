@@ -7,7 +7,7 @@ Notes
         - Content/L10N/en/Pal/DataTable/Text/DT_ItemNameText_Common.json
     - Description:
         - Content/L10N/en/Pal/DataTable/Text/DT_ItemDescriptionText_Common.json
-    - Monster Drops: (Priority)
+    - Monster Drops:
         - Content/Pal/DataTable/Character/DT_PalDropItem.json
 - Pals:
     - Names:
@@ -32,14 +32,14 @@ Notes
         - Content/L10N/en/Pal/DataTable/Text/DT_SkillNameText_Common.json
     - Description:
         - Content/L10N/en/Pal/DataTable/Text/DT_SkillDescText_Common.json
-    - Active: (Priority)
+    - Active:
         - Content/Pal/DataTable/Waza/DT_WazaMasterLevel.json
-    - Partner Skills: (Priority)
+    - Partner Skills:
         - Description:
             - Content/L10N/en/Pal/DataTable/Text/DT_PalFirstActivatedInfoText.json
-    - Manually activated skills: (Priority)
+    - Manually activated skills:
         - Content/Pal/DataTable/PartnerSkill/DT_PartnerSkill.json
-    - Passive skills: (Priority)
+    - Passive skills:
         - Content/Pal/DataTable/PassiveSkill/DT_PassiveSkill_Main.json
     - Mapping:
         - Content/Pal/Blueprint/Character/Monster/PalActorBP/\*/\*.json
@@ -50,7 +50,7 @@ Notes
         - Properties.PassiveSkills (array if passive, each item of the array is the levels of the skill, look this up in DT_PassiveSkill_Main)
         - Properties.SkillName (string if active, look this up in DT_PartnerSkill)
         - Damage/similar is ActiveSkill_MainValueByRank
-        - Cool down is ActiveSkill_OverWriteCoolTimeByRank
+        - Cooldown is ActiveSkill_OverWriteCoolTimeByRank
     - Basic Stats:
         - Content/Pal/DataTable/Waza/DT_WazaDataTable.json
 

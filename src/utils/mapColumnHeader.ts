@@ -1,7 +1,7 @@
 import { pascalCaseToTitleCase } from "./pascalCaseToTitleCase";
 
 /* eslint-disable @typescript-eslint/naming-convention */
-const map = {
+const map: Record<string, string> = {
     ElementType1: "Element 1",
     ElementType2: "Element 2",
     ZukanIndex: "PalBox ID",
@@ -22,7 +22,7 @@ const map = {
 
 export function mapColumnHeader(header: string): string {
     if (header in map) {
-        return map[header as keyof typeof map];
+        return map[header];
     }
     header = pascalCaseToTitleCase(header);
     header = header.replaceAll("_", " ");

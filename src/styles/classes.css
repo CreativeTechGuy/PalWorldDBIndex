@@ -11,15 +11,27 @@
     color: lightcoral;
 }
 
+.floating-button {
+    position: fixed;
+    right: 1em;
+    bottom: 1em;
+    background-color: darkturquoise;
+    border-radius: 50%;
+    padding: 0.5rem;
+    width: 3rem;
+    height: 3rem;
+    box-shadow: 1px 1px 5px 2px #000000b3;
+}
+
 .hover-content {
     position: absolute;
     width: max-content;
     top: -100000px;
     left: -100000px;
     z-index: 10;
-    background: lightcoral;
-    padding: 1em;
-    border-radius: 1em;
+    background-color: darkturquoise;
+    padding: 1rem;
+    border-radius: 1rem;
     border: 1px solid black;
     box-shadow: 3px 2px 5px 0px #000000b3;
 }
@@ -28,6 +40,43 @@
     text-align: center;
 }
 
+.bold {
+    font-weight: bold;
+}
+
 .one-line-text {
     white-space: nowrap;
+}
+
+.dialog-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: #6e6e6e9c;
+    display: grid;
+    place-content: center;
+    z-index: 11;
+}
+
+.dialog-container {
+    position: relative;
+    background-color: darkturquoise;
+    padding: 1rem;
+    padding-top: 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid black;
+    box-shadow: 3px 2px 5px 0px #000000b3;
+}
+
+.dialog-header {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 0.5rem;
+    width: calc(100% + 1rem);
+    transform: translateX(-0.5rem);
+}
+
+.dialog-title {
+    flex-grow: 1;
+    text-align: center;
+    font-size: 2rem;
 }

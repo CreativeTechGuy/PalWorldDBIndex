@@ -5,7 +5,7 @@ import type { CustomFieldProps } from "./customFields";
 export function PalDescription(props: CustomFieldProps<string>): JSXElement {
     return (
         <div class="one-line-text">
-            <FormatTextTags text={props.palData.PalDescription} ignoreLineBreaks={true} />
+            <FormatTextTags text={props.palData.PalDescription} oneLine={true} />
         </div>
     );
 }

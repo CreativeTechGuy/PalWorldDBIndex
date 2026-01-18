@@ -1,47 +1,58 @@
 import { createMemo, For, type JSXElement } from "solid-js";
 import { Hover } from "~/components/Hover";
+import { sphereSettings } from "~/config/sphereSettings";
 import itemNames from "~/raw_data/DT_ItemNameText_Common.json";
-import { getMaxPalLevelForSpheres, type MinimumSpheres } from "~/utils/getCaptureRate";
+import { convertDataTableType } from "~/utils/convertDataTableType";
+import { getMaxPalLevelForSpheres, maxWildPalLevel, type MinimumSpheres } from "~/utils/getCaptureRate";
 import { getPalBossData } from "~/utils/getPalBossData";
 import type { CustomFieldProps } from "./customFields";
 
-const textRows = itemNames[0].Rows;
+const textRows = convertDataTableType(itemNames);
 
 export function MinimumSphere(props: CustomFieldProps<string>): JSXElement {
-    const minimumSpheres = createMemo(() =>
+    const maxLevels = createMemo(() =>
         getMaxPalLevelForSpheres({
-            healthRemaining: 0.1,
-            lifmunkLevel: 5,
-            worldSettingCaptureRate: 1,
+            ...sphereSettings(),
             palIntrinsicCaptureRate: props.palData.CaptureRateCorrect,
-            minCaptureRateAcceptable: 0.05,
-            isBack: false,
         })
     );
     const palBossData = createMemo(() => getPalBossData(props.palData.Id));
     const hasUniqueBossStats = createMemo(() => palBossData().CaptureRateCorrect !== props.palData.CaptureRateCorrect);
-    const minimumSpheresBoss = createMemo(() => {
+    const maxLevelsBoss = createMemo(() => {
         if (!hasUniqueBossStats()) {
-            return minimumSpheres();
+            return maxLevels();
         }
         return getMaxPalLevelForSpheres({
-            healthRemaining: 0.1,
-            lifmunkLevel: 5,
-            worldSettingCaptureRate: 1,
+            ...sphereSettings(),
             palIntrinsicCaptureRate: palBossData().CaptureRateCorrect,
-            minCaptureRateAcceptable: 0.05,
-            isBack: false,
         });
     });
     return (
         <Hover label={props.value}>
-            {hasUniqueBossStats() && <div class="center">Normal Pal</div>}
-            <SphereList spheres={minimumSpheres()} />
+            <table>
+                <tbody>
+                    <tr>
+                        <td>{sphereSettings().healthRemaining * 100}%</td>
+                        <td>Health</td>
+                    </tr>
+                    <tr>
+                        <td>{sphereSettings().minCaptureRateAcceptable * 100}%</td>
+                        <td>Minimum Capture Rate</td>
+                    </tr>
+                    <tr>
+                        <td>{sphereSettings().isBack ? "Yes" : "No"}</td>
+                        <td>Back Bonus</td>
+                    </tr>
+                </tbody>
+            </table>
+            <br />
+            {hasUniqueBossStats() && <div class="center bold">Normal Pal</div>}
+            <SphereList spheres={maxLevels()} />
             {hasUniqueBossStats() && (
                 <>
                     <br />
-                    {hasUniqueBossStats() && <div class="center">Boss Pal</div>}
-                    <SphereList spheres={minimumSpheresBoss()} />
+                    {hasUniqueBossStats() && <div class="center bold">Boss Pal</div>}
+                    <SphereList spheres={maxLevelsBoss()} />
                 </>
             )}
         </Hover>
@@ -53,19 +64,38 @@ type SphereListProps = {
 };
 
 function SphereList(props: SphereListProps): JSXElement {
+    const entries = createMemo(() => Object.entries(props.spheres));
     return (
         <table>
-            <For each={Object.entries(props.spheres)}>
-                {([sphere, minLevel]) => {
-                    const sphereId = sphere === "Normal" ? "ITEM_NAME_PalSphere" : `ITEM_NAME_PalSphere_${sphere}`;
-                    return (
-                        <tr>
-                            <td>{textRows[sphereId as keyof typeof textRows].TextData.LocalizedString}</td>
-                            <td>{minLevel}</td>
-                        </tr>
-                    );
-                }}
-            </For>
+            <tbody>
+                <tr>
+                    <th>Pal Level</th>
+                    <th>Min Sphere</th>
+                </tr>
+                <For each={entries()}>
+                    {([sphere, maxLevel], index) => {
+                        const sphereId = sphere === "Normal" ? "ITEM_NAME_PalSphere" : `ITEM_NAME_PalSphere_${sphere}`;
+                        const previousLevel = createMemo(() => (index() === 0 ? 0 : entries()[index() - 1][1]));
+                        return (
+                            <tr>
+                                <td>
+                                    {maxLevel === 0 ? (
+                                        <>N/A</>
+                                    ) : (
+                                        <>
+                                            {Math.min(maxWildPalLevel, previousLevel() + 1)
+                                                .toString()
+                                                .padStart(2, "0")}{" "}
+                                            - {maxLevel.toString().padStart(2, "0")}
+                                        </>
+                                    )}
+                                </td>
+                                <td>{textRows[sphereId].TextData.LocalizedString}</td>
+                            </tr>
+                        );
+                    }}
+                </For>
+            </tbody>
         </table>
     );
 }

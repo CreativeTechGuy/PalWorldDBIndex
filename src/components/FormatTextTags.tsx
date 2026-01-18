@@ -5,22 +5,24 @@ import mapObjectNames from "~/raw_data/DT_MapObjectNameText_Common.json";
 import characterNames from "~/raw_data/DT_PalNameText_Common.json";
 import skillNames from "~/raw_data/DT_SkillNameText_Common.json";
 import uiNames from "~/raw_data/DT_UI_Common_Text_Common.json";
+import { convertDataTableType } from "~/utils/convertDataTableType";
 
 type FormatTextTagsProps = {
     text: string;
-    ignoreLineBreaks?: boolean;
+    interpolationData?: Record<string, string | number | boolean>;
+    oneLine?: boolean;
 };
 
-const itemNamesMap = itemNames[0].Rows;
-const mapNamesMap = mapObjectNames[0].Rows;
-const uiNamesMap = uiNames[0].Rows;
-const skillNamesMap = skillNames[0].Rows;
-const characterNamesMap = characterNames[0].Rows;
+const itemNamesMap = convertDataTableType(itemNames);
+const mapNamesMap = convertDataTableType(mapObjectNames);
+const uiNamesMap = convertDataTableType(uiNames);
+const skillNamesMap = convertDataTableType(skillNames);
+const characterNamesMap = convertDataTableType(characterNames);
 
 export function FormatTextTags(props: FormatTextTagsProps): JSXElement {
     const replacedStringParts = createMemo(() => {
-        const lines = replaceInString(props.text).split("\r\n");
-        if (props.ignoreLineBreaks === true) {
+        const lines = replaceInString(props.text, props.interpolationData).split("\r\n");
+        if (props.oneLine === true) {
             return [lines.join(" ")];
         }
         return lines.flatMap((x) => [<br />, x]).slice(1);
@@ -28,24 +30,33 @@ export function FormatTextTags(props: FormatTextTagsProps): JSXElement {
     return <For each={replacedStringParts()}>{(str) => str}</For>;
 }
 
-function replaceInString(str: string): string {
+function replaceInString(str: string, data?: Record<string, string | number | boolean>): string {
     str = str.replace(/<itemName id=\|(\w+)\|\/>/gi, (match, id) => {
-        return itemNamesMap[`ITEM_NAME_${id}` as keyof typeof itemNamesMap].TextData.LocalizedString;
+        return itemNamesMap[`ITEM_NAME_${id}`].TextData.LocalizedString;
     });
     str = str.replace(/<mapObjectName id=\|(\w+)\|\/>/gi, (match, id) => {
-        return mapNamesMap[`MAPOBJECT_NAME_${id}` as keyof typeof mapNamesMap].TextData.LocalizedString;
+        return mapNamesMap[`MAPOBJECT_NAME_${id}`].TextData.LocalizedString;
     });
-    str = str.replace(/<uiCommon id=\|(\w+)\|\/>/gi, (match, id) => {
-        return uiNamesMap[id as keyof typeof uiNamesMap].TextData.LocalizedString;
+    str = str.replace(/<uiCommon id=\|(\w+)\|\/>/gi, (match, id: string) => {
+        return uiNamesMap[id].TextData.LocalizedString;
     });
     str = str.replace(/<activeSkillName id=\|(\w+)\|\/>/gi, (match, id) => {
-        return skillNamesMap[`ACTION_SKILL_${id}` as keyof typeof skillNamesMap].TextData.LocalizedString;
+        return skillNamesMap[`ACTION_SKILL_${id}`].TextData.LocalizedString;
     });
     str = str.replace(/<characterName id=\|(\w+)\|\/>/gi, (match, id) => {
-        return characterNamesMap[`PAL_NAME_${id}` as keyof typeof characterNamesMap].TextData.LocalizedString;
+        return characterNamesMap[`PAL_NAME_${id}`].TextData.LocalizedString;
     });
+    str = str.replace(/<Num(Red|Blue)_13>(.+)<\/>/gi, "$2");
+    if (data !== undefined) {
+        str = str.replace(/{(\w+)}/g, (match, id: string) => {
+            return data[id].toString();
+        });
+    }
     if (str.includes("id=|")) {
         throw new Error(`String tag not replaced: ${str}`);
+    }
+    if (str.match(/{\w+}/) !== null) {
+        throw new Error(`String variable not interpolated: ${str}`);
     }
     return str;
 }
