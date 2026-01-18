@@ -4,7 +4,18 @@ import solidPlugin from "vite-plugin-solid";
 
 export default defineConfig({
     base: "./",
-    plugins: [solidPlugin()],
+    plugins: [
+        solidPlugin(),
+        {
+            name: "add-build-date",
+            transformIndexHtml: {
+                order: "post",
+                handler: (html) => {
+                    return html.replace("BUILD_DATE", new Date().toLocaleDateString());
+                },
+            },
+        },
+    ],
     resolve: {
         alias: {
             "~": resolve(import.meta.dirname, "src"),
