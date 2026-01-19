@@ -11,16 +11,16 @@ export const defaultColumnOrder: (keyof CombinedData)[] = [
     "SpawnLocations",
     "MinimumSphere",
     "Rarity",
+    "StatTotal",
     "Hp",
     "ShotAttack",
     "Defense",
-    "StatTotal",
     "SlowWalkSpeed",
     "WalkSpeed",
     "RunSpeed",
+    "RideSprintSpeed",
     "IsRidable",
     "IsFlying",
-    "RideSprintSpeed",
     "IsSwimming",
     "SwimSpeed",
     "SwimDashSpeed",
@@ -71,6 +71,8 @@ export const defaultHiddenColumns: (keyof CombinedData)[] = [
     "BattleBGM",
     "CombiDuplicatePriority",
 ];
+
+export const unsortableColumns: (keyof CombinedData)[] = ["MinimumSphere", "ItemDrops"];
 
 export const [userColumnSettings, setUserColumnSettings] = createSignal(
     loadOrDefault("column-settings", {

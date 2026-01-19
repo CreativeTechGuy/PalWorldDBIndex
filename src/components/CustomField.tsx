@@ -7,6 +7,7 @@ import { customFields } from "./CustomFields/customFields";
 type CustomFieldProps = {
     property: keyof CombinedData;
     palData: CombinedData;
+    updateData: (newData: CombinedData) => void;
 };
 
 export function CustomField(props: CustomFieldProps): JSXElement {
@@ -17,6 +18,7 @@ export function CustomField(props: CustomFieldProps): JSXElement {
                     component={customFields[props.property]}
                     value={props.palData[props.property]}
                     palData={props.palData}
+                    updateData={props.updateData}
                 />
             ) : (
                 <span>{mapCellValue(props.palData[props.property].toString())}</span>

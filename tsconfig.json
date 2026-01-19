@@ -4,6 +4,7 @@
         "strict": true,
         "target": "ESNext",
         "lib": ["ES2024", "DOM", "DOM.Iterable"],
+        "checkJs": false,
         "allowJs": true,
         "jsx": "preserve",
         "jsxImportSource": "solid-js",

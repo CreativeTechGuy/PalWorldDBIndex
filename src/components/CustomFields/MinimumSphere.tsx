@@ -28,34 +28,40 @@ export function MinimumSphere(props: CustomFieldProps<string>): JSXElement {
         });
     });
     return (
-        <Hover label={props.value}>
-            <table>
-                <tbody>
-                    <tr>
-                        <td>{sphereSettings().healthRemaining * 100}%</td>
-                        <td>Health</td>
-                    </tr>
-                    <tr>
-                        <td>{sphereSettings().minCaptureRateAcceptable * 100}%</td>
-                        <td>Minimum Capture Rate</td>
-                    </tr>
-                    <tr>
-                        <td>{sphereSettings().isBack ? "Yes" : "No"}</td>
-                        <td>Back Bonus</td>
-                    </tr>
-                </tbody>
-            </table>
-            <br />
-            {hasUniqueBossStats() && <div class="center bold">Normal Pal</div>}
-            <SphereList spheres={maxLevels()} />
-            {hasUniqueBossStats() && (
-                <>
+        <>
+            {props.palData.SpawnLocations !== "Raid only" ? (
+                <Hover label={props.value}>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>{sphereSettings().healthRemaining * 100}%</td>
+                                <td>Health</td>
+                            </tr>
+                            <tr>
+                                <td>{sphereSettings().minCaptureRateAcceptable * 100}%</td>
+                                <td>Minimum Capture Rate</td>
+                            </tr>
+                            <tr>
+                                <td>{sphereSettings().isBack ? "Yes" : "No"}</td>
+                                <td>Back Bonus</td>
+                            </tr>
+                        </tbody>
+                    </table>
                     <br />
-                    {hasUniqueBossStats() && <div class="center bold">Boss Pal</div>}
-                    <SphereList spheres={maxLevelsBoss()} />
-                </>
+                    {hasUniqueBossStats() && <div class="center bold">Normal Pal</div>}
+                    <SphereList spheres={maxLevels()} />
+                    {hasUniqueBossStats() && (
+                        <>
+                            <br />
+                            {hasUniqueBossStats() && <div class="center bold">Boss Pal</div>}
+                            <SphereList spheres={maxLevelsBoss()} />
+                        </>
+                    )}
+                </Hover>
+            ) : (
+                "N/A"
             )}
-        </Hover>
+        </>
     );
 }
 

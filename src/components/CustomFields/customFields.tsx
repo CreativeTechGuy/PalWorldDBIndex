@@ -11,6 +11,7 @@ import { SpawnLocations } from "./SpawnLocations";
 export type CustomFieldProps<Value> = {
     value: Value;
     palData: CombinedData;
+    updateData: (newData: CombinedData) => void;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,33 +1,39 @@
 import { createMemo, createSignal, For, onMount, type JSXElement } from "solid-js";
 import { Dialog } from "~/components/Dialog";
-import spawnLocations from "~/raw_data/DT_PaldexDistributionData.json";
+import { spawnLocationMap as spawnLocationMapUntyped, spawnerLocationMap } from "~/data/spawnLocations";
+import raidBossData from "~/raw_data/DT_PalRaidBoss.json";
+import wildSpawnersData from "~/raw_data/DT_PalWildSpawner.json";
 import worldMapScaleData from "~/raw_data/DT_WorldMapUIData.json";
 import mapImg from "~/raw_data/T_WorldMap.png";
+import type { SpawnData, SpawnerData } from "~/types/SpawnLocations";
 import { convertDataTableType } from "~/utils/convertDataTableType";
 import type { CustomFieldProps } from "./customFields";
 
-type SpawnFile = [
-    {
-        Rows: Partial<
-            Record<
-                string,
-                {
-                    dayTimeLocations: {
-                        locations: { X: number; Y: number; Z: number }[];
-                        Radius: number;
-                    };
-                    nightTimeLocations: {
-                        locations: { X: number; Y: number; Z: number }[];
-                        Radius: number;
-                    };
-                }
-            >
-        >;
-    },
-];
-
+const spawnLocationMap = spawnLocationMapUntyped as SpawnData;
 const worldMapScale = worldMapScaleData[0].Rows;
-const spawnLocationMap = convertDataTableType(spawnLocations as unknown as SpawnFile);
+const raidBossMap = convertDataTableType(raidBossData);
+const spawnerLocations = Object.values(spawnerLocationMap as SpawnerData);
+const dungeonSpawns = Object.entries(convertDataTableType(wildSpawnersData)).reduce<
+    Record<string, { X: number; Y: number; Radius: number }[]>
+>((acc, [key, value]) => {
+    if (!key.startsWith("dungeon_")) {
+        return acc;
+    }
+    const pals = [value.Pal_1, value.Pal_2, value.Pal_3].filter((id) => id !== "None");
+    const spawnerLocationData = spawnerLocations.find((spawner) => spawner.SpawnerName === value.SpawnerName);
+    if (spawnerLocationData === undefined) {
+        return acc;
+    }
+    for (const pal of pals) {
+        acc[pal] ??= [];
+        acc[pal].push({
+            X: spawnerLocationData.Location.X,
+            Y: spawnerLocationData.Location.Y,
+            Radius: spawnerLocationData.StaticRadius,
+        });
+    }
+    return acc;
+}, {});
 
 export function SpawnLocations(props: CustomFieldProps<string>): JSXElement {
     const [open, setOpen] = createSignal(false);
@@ -37,41 +43,73 @@ export function SpawnLocations(props: CustomFieldProps<string>): JSXElement {
             spawnLocationMap[props.palData.Id]?.[isDay() ? "dayTimeLocations" : "nightTimeLocations"].Radius ??
             spawnLocationMap[`BOSS_${props.palData.Id}`]?.[isDay() ? "dayTimeLocations" : "nightTimeLocations"].Radius
     );
-    const daySpawnLocations = createMemo(() => [
-        ...(spawnLocationMap[props.palData.Id]?.dayTimeLocations.locations ?? []),
-        ...(spawnLocationMap[`BOSS_${props.palData.Id}`]?.dayTimeLocations.locations ?? []),
-    ]);
-    const nightSpawnLocations = createMemo(() => [
-        ...(spawnLocationMap[props.palData.Id]?.nightTimeLocations.locations ?? []),
-        ...(spawnLocationMap[`BOSS_${props.palData.Id}`]?.nightTimeLocations.locations ?? []),
-    ]);
+    const daySpawnLocations = createMemo(() =>
+        removeDuplicatePoints([
+            ...(spawnLocationMap[props.palData.Id]?.dayTimeLocations.locations ?? []),
+            ...(spawnLocationMap[`BOSS_${props.palData.Id}`]?.dayTimeLocations.locations ?? []),
+        ])
+    );
+    const nightSpawnLocations = createMemo(() =>
+        removeDuplicatePoints([
+            ...(spawnLocationMap[props.palData.Id]?.nightTimeLocations.locations ?? []),
+            ...(spawnLocationMap[`BOSS_${props.palData.Id}`]?.nightTimeLocations.locations ?? []),
+        ])
+    );
     const hasDaySpawns = createMemo(() => daySpawnLocations().length > 0);
     const hasNightSpawns = createMemo(() => nightSpawnLocations().length > 0);
-    const hasNoSpawns = createMemo(() => !hasDaySpawns() && !hasNightSpawns());
+    const hasNoOverworldSpawns = createMemo(() => !hasDaySpawns() && !hasNightSpawns());
     const spawnsTimeIdentical = createMemo(() => areArraysIdentical(daySpawnLocations(), nightSpawnLocations()));
     const canSwitchTime = createMemo(() => hasDaySpawns() && hasNightSpawns() && !spawnsTimeIdentical());
+    const isRaidBoss = createMemo(() => `PalSummon_${props.palData.Id}` in raidBossMap);
+    const dungeonSpawnLocations = createMemo(() => removeDuplicatePoints(dungeonSpawns[props.palData.Id] ?? []));
+    const title = createMemo(() => {
+        if (dungeonSpawnLocations().length > 0 && hasNoOverworldSpawns()) {
+            return `Dungeons for ${props.palData.Name} (${dungeonSpawnLocations().length})`;
+        }
+        if (spawnsTimeIdentical()) {
+            return `Spawn Areas for ${props.palData.Name} (${daySpawnLocations().length})`;
+        }
+        return `${isDay() ? "Daytime" : "Nighttime"} Spawn Areas for ${props.palData.Name} (${(isDay() ? daySpawnLocations() : nightSpawnLocations()).length})`;
+    });
+    const displayText = createMemo(() => {
+        if (hasNoOverworldSpawns()) {
+            if (dungeonSpawnLocations().length === 0) {
+                if (isRaidBoss()) {
+                    return "Raid only";
+                }
+                return "N/A";
+            }
+            return "Dungeon";
+        }
+        return "Overworld";
+    });
+
     onMount(() => {
         if (!hasDaySpawns() && hasNightSpawns()) {
             setIsDay(false);
         }
+        if (props.palData.SpawnLocations !== displayText()) {
+            props.updateData({
+                ...props.palData,
+                SpawnLocations: displayText(),
+            });
+        }
     });
     return (
         <>
-            <button onClick={() => setOpen(true)} class="link-button">
-                {props.value}
-            </button>
-            {open() && (
-                <Dialog
-                    title={`${!spawnsTimeIdentical() ? (isDay() ? "Daytime " : "Nighttime ") : ""}Spawn Areas for ${props.palData.Name} (${(isDay() ? daySpawnLocations() : nightSpawnLocations()).length})`}
-                    onClose={() => {
-                        setOpen(false);
-                    }}
-                >
-                    <div class="center">
-                        {hasNoSpawns() ? (
-                            "No overworld spawns for this pal."
-                        ) : (
-                            <>
+            {!hasNoOverworldSpawns() || dungeonSpawnLocations().length > 0 ? (
+                <>
+                    <button onClick={() => setOpen(true)} class="link-button">
+                        {displayText()}
+                    </button>
+                    {open() && (
+                        <Dialog
+                            title={title()}
+                            onClose={() => {
+                                setOpen(false);
+                            }}
+                        >
+                            <div class="center">
                                 {canSwitchTime() && (
                                     <div>
                                         <button
@@ -99,12 +137,20 @@ export function SpawnLocations(props: CustomFieldProps<string>): JSXElement {
                                         class="map-markers"
                                         viewBox={`${worldMapScale.MainMap.landScapeRealPositionMin.X} ${worldMapScale.MainMap.landScapeRealPositionMin.Y} ${worldMapScale.MainMap.landScapeRealPositionMax.X - worldMapScale.MainMap.landScapeRealPositionMin.X} ${worldMapScale.MainMap.landScapeRealPositionMax.Y - worldMapScale.MainMap.landScapeRealPositionMin.Y}`}
                                     >
-                                        <For each={isDay() ? daySpawnLocations() : nightSpawnLocations()}>
+                                        <For<{ X: number; Y: number; Radius?: number }[], JSXElement>
+                                            each={
+                                                dungeonSpawnLocations().length > 0
+                                                    ? dungeonSpawnLocations()
+                                                    : isDay()
+                                                      ? daySpawnLocations()
+                                                      : nightSpawnLocations()
+                                            }
+                                        >
                                             {(point) => (
                                                 <circle
-                                                    style={{ "--initial-radius": radius() }}
+                                                    style={{ "--initial-radius": point.Radius ?? radius() }}
                                                     class="map-dot"
-                                                    r={radius()}
+                                                    r={point.Radius ?? radius()}
                                                     fill="yellow"
                                                     fill-opacity="1"
                                                     cx={point.X}
@@ -114,19 +160,18 @@ export function SpawnLocations(props: CustomFieldProps<string>): JSXElement {
                                         </For>
                                     </svg>
                                 </div>
-                            </>
-                        )}
-                    </div>
-                </Dialog>
+                            </div>
+                        </Dialog>
+                    )}
+                </>
+            ) : (
+                displayText()
             )}
         </>
     );
 }
 
-function areArraysIdentical(
-    arr1: { X: number; Y: number; Z: number }[],
-    arr2: { X: number; Y: number; Z: number }[]
-): boolean {
+function areArraysIdentical(arr1: { X: number; Y: number }[], arr2: { X: number; Y: number }[]): boolean {
     if (arr1.length !== arr2.length) {
         return false;
     }
@@ -136,4 +181,16 @@ function areArraysIdentical(
         }
     }
     return true;
+}
+
+function removeDuplicatePoints(arr: { X: number; Y: number }[]): { X: number; Y: number }[] {
+    const seenPoints = new Set<string>();
+    return arr.filter((item) => {
+        const point = `${item.X},${item.Y}`;
+        if (seenPoints.has(point)) {
+            return false;
+        }
+        seenPoints.add(point);
+        return true;
+    });
 }

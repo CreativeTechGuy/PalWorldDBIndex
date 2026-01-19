@@ -1,5 +1,6 @@
 import { createEffect, createSignal, For, onMount, runWithOwner, type JSXElement } from "solid-js";
 import { loadOrDefault } from "~/config/loadOrDefault";
+import { unsortableColumns } from "~/config/tableColumns";
 import { columnOrder } from "~/data/orderedColumns";
 import { rows, setRows } from "~/data/palCombinedData";
 import { arrayIncludes } from "~/utils/arrayIncludes";
@@ -31,18 +32,21 @@ runWithOwner(fakeSolidOwner, () => {
 export function PalTable(): JSXElement {
     const [highlightedRow, setHighlightedRow] = createSignal("");
     onMount(() => {
-        const columnName = lastSortedColumn();
-        const sortAscending = lastSortDirectionAscending();
-        if (columnName !== "none") {
-            setLastSortedColumn("none");
-            if (!sortAscending) {
-                setLastSortDirectionAscending((current) => !current);
-            }
-            sortColumn(columnName);
-            if (!sortAscending) {
+        // eslint-disable-next-line solid/reactivity -- Wait for any display text to get replaced by their respective components
+        window.requestAnimationFrame(() => {
+            const columnName = lastSortedColumn();
+            const sortAscending = lastSortDirectionAscending();
+            if (columnName !== "none") {
+                setLastSortedColumn("none");
+                if (!sortAscending) {
+                    setLastSortDirectionAscending((current) => !current);
+                }
                 sortColumn(columnName);
+                if (!sortAscending) {
+                    sortColumn(columnName);
+                }
             }
-        }
+        });
     });
     function sortColumn(columnName: ReturnType<typeof columnOrder>[number]): void {
         if (lastSortedColumn() === columnName) {
@@ -99,7 +103,11 @@ export function PalTable(): JSXElement {
                 <For each={columnOrder()}>
                     {(columnName) => (
                         <th
+                            class={unsortableColumns.includes(columnName) ? "no-sort" : undefined}
                             onClick={() => {
+                                if (unsortableColumns.includes(columnName)) {
+                                    return;
+                                }
                                 sortColumn(columnName);
                             }}
                         >
@@ -117,9 +125,9 @@ export function PalTable(): JSXElement {
             </thead>
             <tbody>
                 <For each={rows()}>
-                    {(palData) => (
+                    {(palData, index) => (
                         <tr
-                            class={highlightedRow() === palData.Id ? "highlight" : ""}
+                            class={highlightedRow() === palData.Id ? "highlight" : undefined}
                             onClick={function (this: HTMLTableRowElement, evt) {
                                 if (evt.target !== this && evt.target.parentElement !== this) {
                                     return;
@@ -134,7 +142,16 @@ export function PalTable(): JSXElement {
                             <For each={columnOrder()}>
                                 {(columnName) => (
                                     <td>
-                                        <CustomField property={columnName} palData={palData} />
+                                        <CustomField
+                                            property={columnName}
+                                            palData={palData}
+                                            updateData={(newData: typeof palData) => {
+                                                const i = index();
+                                                setRows((current) => {
+                                                    return [...current.slice(0, i), newData, ...current.slice(i + 1)];
+                                                });
+                                            }}
+                                        />
                                     </td>
                                 )}
                             </For>

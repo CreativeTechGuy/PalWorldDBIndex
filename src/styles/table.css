@@ -27,7 +27,9 @@
 
     & th {
         border-bottom: 2px solid black;
-        cursor: pointer;
+        &:not(.no-sort) {
+            cursor: pointer;
+        }
     }
 
     & td:first-child {
