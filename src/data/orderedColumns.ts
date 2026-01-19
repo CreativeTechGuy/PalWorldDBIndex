@@ -15,6 +15,7 @@ export const configurableColumns = buildColumnOrder({
     firstColumns: defaultColumnOrder,
     lastColumns: [],
     hiddenColumns: [...unmovableLeftColumns, ...forceHiddenColumns],
+    hideRedundantColumns: false,
 });
 runWithOwner(fakeSolidOwner, () => {
     createEffect(() => {
@@ -29,6 +30,7 @@ runWithOwner(fakeSolidOwner, () => {
                 ],
                 lastColumns: userColumnSettings().columnsLast as (keyof CombinedData)[],
                 hiddenColumns: [...new Set([...userColumnSettings().hidden, ...forceHiddenColumns])],
+                hideRedundantColumns: true,
             })
         );
     });
@@ -38,6 +40,7 @@ function buildColumnOrder<Value extends keyof CombinedData>(options: {
     firstColumns: Value[];
     lastColumns: Value[];
     hiddenColumns: Value[];
+    hideRedundantColumns: boolean;
 }): Value[] {
     const columns: Value[] = [...options.firstColumns];
     // Any columns which are the same for every pal
@@ -47,24 +50,27 @@ function buildColumnOrder<Value extends keyof CombinedData>(options: {
             columns.push(property as Value);
         }
     }
-    for (const column of columns) {
-        if (
-            arrayIncludes(customColumns, column) ||
-            arrayIncludes(options.firstColumns, column) ||
-            arrayIncludes(options.lastColumns, column)
-        ) {
-            continue;
-        }
-        const firstValue = rows()[0][column];
-        let shouldHide = true;
-        for (const row of rows()) {
-            if (row[column] !== firstValue) {
-                shouldHide = false;
-                break;
+    if (options.hideRedundantColumns) {
+        for (const column of columns) {
+            if (
+                arrayIncludes(customColumns, column) ||
+                arrayIncludes(options.firstColumns, column) ||
+                arrayIncludes(options.lastColumns, column) ||
+                arrayIncludes(options.hiddenColumns, column)
+            ) {
+                continue;
             }
-        }
-        if (shouldHide) {
-            redundantColumns.push(column);
+            const firstValue = rows()[0][column];
+            let shouldHide = true;
+            for (const row of rows()) {
+                if (row[column] !== firstValue) {
+                    shouldHide = false;
+                    break;
+                }
+            }
+            if (shouldHide) {
+                redundantColumns.push(column);
+            }
         }
     }
     for (const column of [...options.hiddenColumns, ...redundantColumns]) {

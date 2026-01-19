@@ -2,6 +2,7 @@ import { createEffect, createSignal, For, onMount, runWithOwner, type JSXElement
 import { loadOrDefault } from "~/config/loadOrDefault";
 import { columnOrder } from "~/data/orderedColumns";
 import { rows, setRows } from "~/data/palCombinedData";
+import { arrayIncludes } from "~/utils/arrayIncludes";
 import { fakeSolidOwner } from "~/utils/fakeSolidOwner";
 import { mapCellValue } from "~/utils/mapCellValue";
 import { mapColumnHeader } from "~/utils/mapColumnHeader";
@@ -63,6 +64,8 @@ export function PalTable(): JSXElement {
                 }
             }
             if (isNumericFieldCache.get(columnName) === true) {
+                multiplier = -1;
+            } else if (arrayIncludes(["true", "false"], rows()[0][columnName])) {
                 multiplier = -1;
             }
 
