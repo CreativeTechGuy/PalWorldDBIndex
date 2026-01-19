@@ -51,4 +51,12 @@
     & tbody > tr:hover > td:nth-child(2n) {
         background-color: lightskyblue;
     }
+
+    & tbody > tr.highlight > td {
+        background-color: lightgreen;
+    }
+
+    & tbody > tr.highlight > td:nth-child(2n) {
+        background-color: greenyellow;
+    }
 }

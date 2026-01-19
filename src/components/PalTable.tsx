@@ -29,6 +29,7 @@ runWithOwner(fakeSolidOwner, () => {
 });
 
 export function PalTable(): JSXElement {
+    const [highlightedRow, setHighlightedRow] = createSignal("");
     onMount(() => {
         const columnName = lastSortedColumn();
         const sortAscending = lastSortDirectionAscending();
@@ -117,7 +118,19 @@ export function PalTable(): JSXElement {
             <tbody>
                 <For each={rows()}>
                     {(palData) => (
-                        <tr>
+                        <tr
+                            class={highlightedRow() === palData.Id ? "highlight" : ""}
+                            onClick={function (this: HTMLTableRowElement, evt) {
+                                if (evt.target !== this && evt.target.parentElement !== this) {
+                                    return;
+                                }
+                                if (highlightedRow() === palData.Id) {
+                                    setHighlightedRow("");
+                                } else {
+                                    setHighlightedRow(palData.Id);
+                                }
+                            }}
+                        >
                             <For each={columnOrder()}>
                                 {(columnName) => (
                                     <td>
