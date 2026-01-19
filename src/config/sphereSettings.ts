@@ -5,7 +5,7 @@ import { loadOrDefault } from "./loadOrDefault";
 export const [sphereSettings, setSphereSettings] = createSignal(
     loadOrDefault("sphere-settings", {
         healthRemaining: 0.1,
-        lifmunkLevel: 5,
+        lifmunkLevel: 0,
         worldSettingCaptureRate: 1,
         minCaptureRateAcceptable: 0.05,
         isBack: false,
