@@ -4,6 +4,7 @@ import { Element } from "./Element";
 import { ItemDrops } from "./ItemDrops";
 import { MinimumSphere } from "./MinimumSphere";
 import { Name } from "./Name";
+import { NoMapCellValue } from "./NoMapCellValue";
 import { PalDescription } from "./PalDescription";
 import { PartnerSkill } from "./PartnerSkill";
 import { PassiveSkill } from "./PassiveSkill";
@@ -27,4 +28,5 @@ export const customFields: Record<string, (props: CustomFieldProps<any>) => JSXE
     SpawnLocations,
     ElementType1: Element,
     ElementType2: Element,
+    Id: NoMapCellValue,
 };

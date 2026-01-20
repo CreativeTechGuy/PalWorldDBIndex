@@ -20,7 +20,10 @@ const map: Record<string, string> = {
     WorkSuitability_MonsterFarm: "Farming",
     ShotAttack: "Attack",
     Friendship_ShotAttack: "Friendship Attack",
-    CombatStatTotalFriendship: "Combat Stat Total with Max Friendship",
+    CombatStatTotalWithFriendship: "Combat Stat Total with Max Friendship",
+    HpWithFriendship: "Hp with Max Friendship",
+    AttackWithFriendship: "Attack with Max Friendship",
+    DefenseWithFriendship: "Defense with Max Friendship",
 };
 
 export function mapColumnHeader(header: string): string {

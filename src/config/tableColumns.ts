@@ -9,7 +9,7 @@ export const defaultColumnOrder: (keyof CombinedData)[] = [
     "MinimumSphere",
     "Rarity",
     "CombatStatTotal",
-    "CombatStatTotalFriendship",
+    "CombatStatTotalWithFriendship",
     "Hp",
     "ShotAttack",
     "Defense",
@@ -55,7 +55,6 @@ export const forceHiddenColumns: (keyof CombinedData)[] = [
 ];
 
 export const defaultHiddenColumns: (keyof CombinedData)[] = [
-    "Id",
     "Tribe",
     "BPClass",
     "ZukanIndexSuffix",

@@ -22,7 +22,10 @@ export const customColumns = [
     "SpawnLocations",
     "Rideable",
     "CombatStatTotal",
-    "CombatStatTotalFriendship",
+    "CombatStatTotalWithFriendship",
+    "HpWithFriendship",
+    "AttackWithFriendship",
+    "DefenseWithFriendship",
 ] as const;
 
 export type DerivedPalData = Record<(typeof customColumns)[number], string>;
@@ -32,6 +35,7 @@ const descriptionsMap = convertDataTableType(palDescriptions);
 const techUnlockMap = convertDataTableType(techUnlocks);
 const skillNameMap = convertDataTableType(skillNames, { partialData: true });
 const itemNameMap = convertDataTableType(itemNames);
+const maxFriendship = 10;
 
 export function buildCustomData(key: string, palData: PalMonsterParameter): DerivedPalData | null {
     const palName = getObjectByCaseInsensitiveKey(palNamesMap, `PAL_NAME_${key}`)?.TextData.LocalizedString;
@@ -78,9 +82,11 @@ export function buildCustomData(key: string, palData: PalMonsterParameter): Deri
     }
 
     return {
-        Id: key,
         Name: palName,
         MinimumSphere: "Spheres",
+        HpWithFriendship: Math.round(palData.Hp + palData.Friendship_HP * maxFriendship).toString(),
+        AttackWithFriendship: Math.round(palData.ShotAttack + palData.Friendship_ShotAttack * maxFriendship).toString(),
+        DefenseWithFriendship: Math.round(palData.Defense + palData.Friendship_Defense * maxFriendship).toString(),
         ItemDrops: getPalItemDrops(key)
             .map((item) => itemNameMap[`ITEM_NAME_${item.Id}`].TextData.LocalizedString)
             .join(", "),
@@ -94,18 +100,19 @@ export function buildCustomData(key: string, palData: PalMonsterParameter): Deri
                     : "Land"
             : "",
         CombatStatTotal: (palData.ShotAttack + palData.Defense + palData.Hp).toString(),
-        CombatStatTotalFriendship: Math.round(
+        CombatStatTotalWithFriendship: Math.round(
             palData.ShotAttack +
                 palData.Defense +
                 palData.Hp +
-                palData.Friendship_HP * 10 +
-                palData.Friendship_Defense * 10 +
-                palData.Friendship_ShotAttack * 10
+                palData.Friendship_HP * maxFriendship +
+                palData.Friendship_Defense * maxFriendship +
+                palData.Friendship_ShotAttack * maxFriendship
         ).toString(),
         PartnerSkill: skillNameMap[`PARTNERSKILL_${key}`]?.TextData.LocalizedString ?? "",
         PartnerSkillUnlockLevel: partnerSkillUnlockLevel,
         SpawnLocations: "Map",
         PalDescription: getObjectByCaseInsensitiveKey(descriptionsMap, `PAL_FIRST_SPAWN_DESC_${key}`)!.TextData
             .LocalizedString,
+        Id: key,
     };
 }
