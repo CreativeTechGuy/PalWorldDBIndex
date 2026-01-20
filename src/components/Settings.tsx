@@ -2,13 +2,13 @@ import { createSignal, createUniqueId, type JSXElement } from "solid-js";
 import { Portal } from "solid-js/web";
 import { rootElement } from "~/config/rootElement";
 import { resetSphereSettings, setSphereSettings, sphereSettings } from "~/config/sphereSettings";
+import { unconfigurableColumns } from "~/config/tableColumns";
 import { resetTableSort } from "~/config/tableSort";
 import { resetColumnSettings, setUserColumnSettings, userColumnSettings } from "~/config/userColumns";
-import { configurableColumns } from "~/data/orderedColumns";
 import settingsIcon from "~/icons/settings.svg";
 import { mapColumnHeader } from "~/utils/mapColumnHeader";
 import { Dialog } from "./Dialog";
-import { MultiSelectList } from "./MultiSelectList";
+import { DragAndDropList } from "./DragAndDropList";
 
 export function Settings(): JSXElement {
     const [open, setOpen] = createSignal(false);
@@ -182,7 +182,7 @@ export function Settings(): JSXElement {
                                 </tr>
                                 <tr>
                                     <td>
-                                        <label for={autoHideRedundantColumnsId}>Auto-hide non-unique columns</label>
+                                        <label for={autoHideRedundantColumnsId}>Auto-hide redundant columns</label>
                                     </td>
                                     <td>
                                         <input
@@ -198,9 +198,57 @@ export function Settings(): JSXElement {
                                         />
                                     </td>
                                 </tr>
-                                <ColumnConfigurationRow type="columnsFirst" label="Move columns to front" />
-                                <ColumnConfigurationRow type="columnsLast" label="Move columns to end" />
-                                <ColumnConfigurationRow type="hidden" label="Hide columns" />
+                                <tr>
+                                    <td>Reorder/hide columns</td>
+                                    <td>
+                                        <DragAndDropList
+                                            style={{ height: "10rem", "overflow-y": "auto", width: "max-content" }}
+                                            items={userColumnSettings()
+                                                .columnOrder.filter((column) => !unconfigurableColumns.includes(column))
+                                                .map((column) => ({
+                                                    value: column,
+                                                    label: (
+                                                        <>
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={!userColumnSettings().hidden.includes(column)}
+                                                                onChange={(evt) => {
+                                                                    if (!evt.target.checked) {
+                                                                        setUserColumnSettings((current) => {
+                                                                            return {
+                                                                                ...current,
+                                                                                hidden: [...current.hidden, column],
+                                                                            };
+                                                                        });
+                                                                    } else {
+                                                                        setUserColumnSettings((current) => {
+                                                                            return {
+                                                                                ...current,
+                                                                                hidden: current.hidden.filter(
+                                                                                    (item) => item !== column
+                                                                                ),
+                                                                            };
+                                                                        });
+                                                                    }
+                                                                }}
+                                                            />{" "}
+                                                            {mapColumnHeader(column)}
+                                                        </>
+                                                    ),
+                                                }))}
+                                            onChange={(newList) => {
+                                                setUserColumnSettings((current) => ({
+                                                    ...current,
+                                                    columnOrder: [
+                                                        ...unconfigurableColumns,
+                                                        ...newList.map((item) => item.value),
+                                                    ],
+                                                }));
+                                            }}
+                                        />
+                                    </td>
+                                </tr>
+                                {/* <ColumnConfigurationRow type="hidden" label="Hide columns" /> */}
                                 <tr>
                                     <td colSpan={2} class="center">
                                         <button
@@ -224,52 +272,52 @@ export function Settings(): JSXElement {
     );
 }
 
-type ColumnConfigurationRowProps = {
-    label: string;
-    type: Exclude<keyof ReturnType<typeof userColumnSettings>, "autoHideRedundantColumns">;
-};
+// type ColumnConfigurationRowProps = {
+//     label: string;
+//     type: Exclude<keyof ReturnType<typeof userColumnSettings>, "autoHideRedundantColumns">;
+// };
 
-function ColumnConfigurationRow(props: ColumnConfigurationRowProps): JSXElement {
-    return (
-        <tr>
-            <td>
-                {props.label}
-                <br />({userColumnSettings()[props.type].length} Selected)
-                <br />
-                <button
-                    class="link-button"
-                    onClick={() => {
-                        // eslint-disable-next-line solid/reactivity
-                        setUserColumnSettings((current) => ({
-                            ...current,
-                            [props.type]: [],
-                        }));
-                    }}
-                >
-                    Clear Selection
-                </button>
-            </td>
-            <td>
-                <MultiSelectList
-                    options={configurableColumns.map((columnName) => ({
-                        label: mapColumnHeader(columnName),
-                        value: columnName,
-                    }))}
-                    selected={userColumnSettings()[props.type]}
-                    onChange={(selected) => {
-                        const propsType = props.type;
-                        setUserColumnSettings((current) => {
-                            return {
-                                ...current,
-                                columnsFirst: [...current.columnsFirst].filter((column) => !selected.includes(column)),
-                                columnsLast: [...current.columnsLast].filter((column) => !selected.includes(column)),
-                                hidden: [...current.hidden].filter((column) => !selected.includes(column)),
-                                [propsType]: selected,
-                            };
-                        });
-                    }}
-                />
-            </td>
-        </tr>
-    );
-}
+// function ColumnConfigurationRow(props: ColumnConfigurationRowProps): JSXElement {
+//     return (
+//         <tr>
+//             <td>
+//                 {props.label}
+//                 <br />({userColumnSettings()[props.type].length} Selected)
+//                 <br />
+//                 <button
+//                     class="link-button"
+//                     onClick={() => {
+//                         // eslint-disable-next-line solid/reactivity
+//                         setUserColumnSettings((current) => ({
+//                             ...current,
+//                             [props.type]: [],
+//                         }));
+//                     }}
+//                 >
+//                     Clear Selection
+//                 </button>
+//             </td>
+//             <td>
+//                 <MultiSelectList
+//                     options={configurableColumns.map((columnName) => ({
+//                         label: mapColumnHeader(columnName),
+//                         value: columnName,
+//                     }))}
+//                     selected={userColumnSettings()[props.type]}
+//                     onChange={(selected) => {
+//                         const propsType = props.type;
+//                         setUserColumnSettings((current) => {
+//                             return {
+//                                 ...current,
+//                                 columnsFirst: [...current.columnsFirst].filter((column) => !selected.includes(column)),
+//                                 columnsLast: [...current.columnsLast].filter((column) => !selected.includes(column)),
+//                                 hidden: [...current.hidden].filter((column) => !selected.includes(column)),
+//                                 [propsType]: selected,
+//                             };
+//                         });
+//                     }}
+//                 />
+//             </td>
+//         </tr>
+//     );
+// }

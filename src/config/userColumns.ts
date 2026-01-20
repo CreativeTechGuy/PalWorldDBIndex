@@ -1,14 +1,33 @@
 import { createEffect, createSignal, runWithOwner } from "solid-js";
+import { customColumns } from "~/data/buildCustomData";
+import { rows, type CombinedData } from "~/data/palCombinedData";
+import { arrayIncludes } from "~/utils/arrayIncludes";
 import { fakeSolidOwner } from "~/utils/fakeSolidOwner";
 import { loadOrDefault } from "./loadOrDefault";
-import { defaultHiddenColumns } from "./tableColumns";
+import { defaultColumnOrder, defaultHiddenColumns, forceHiddenColumns } from "./tableColumns";
 
 const defaultSettings = {
-    columnsFirst: [] as string[],
-    columnsLast: [] as string[],
+    columnOrder: ([...new Set([...defaultColumnOrder, ...Object.keys(rows()[0])])] as (keyof CombinedData)[]).filter(
+        (column) => !forceHiddenColumns.includes(column)
+    ),
     hidden: [...defaultHiddenColumns],
     autoHideRedundantColumns: true,
 };
+
+export const redundantColumns = defaultSettings.columnOrder.filter((column) => {
+    if (arrayIncludes(customColumns, column)) {
+        return false;
+    }
+    const firstValue = rows()[0][column];
+    let shouldHide = true;
+    for (const row of rows()) {
+        if (row[column] !== firstValue) {
+            shouldHide = false;
+            break;
+        }
+    }
+    return shouldHide;
+});
 
 export const [userColumnSettings, setUserColumnSettings] = createSignal(
     loadOrDefault("column-settings", defaultSettings)

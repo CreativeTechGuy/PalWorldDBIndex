@@ -34,7 +34,7 @@ export const defaultColumnOrder: (keyof CombinedData)[] = [
     "WorkSuitability_MonsterFarm",
 ];
 
-export const unmovableLeftColumns: (keyof CombinedData)[] = ["Name"];
+export const unconfigurableColumns: (keyof CombinedData)[] = ["Name"];
 
 export const forceHiddenColumns: (keyof CombinedData)[] = [
     "OverrideNameTextID",

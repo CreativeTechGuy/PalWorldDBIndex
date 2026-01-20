@@ -1,14 +1,19 @@
 import { createEffect, createSignal, runWithOwner } from "solid-js";
-import { columnOrder } from "~/data/orderedColumns";
+import type { CombinedData } from "~/data/palCombinedData";
 import { fakeSolidOwner } from "~/utils/fakeSolidOwner";
 import { restrictValueToList } from "~/utils/restrictValueToList";
 import { loadOrDefault } from "./loadOrDefault";
+import { userColumnSettings } from "./userColumns";
 
 const defaultSortColumn = "Name";
 const defaultSortDirectionAscending = true;
 
-export const [lastSortedColumn, setLastSortedColumn] = createSignal<ReturnType<typeof columnOrder>[number]>(
-    restrictValueToList(loadOrDefault("table-sort-column", defaultSortColumn), columnOrder(), defaultSortColumn)
+export const [lastSortedColumn, setLastSortedColumn] = createSignal<keyof CombinedData>(
+    restrictValueToList(
+        loadOrDefault("table-sort-column", defaultSortColumn),
+        userColumnSettings().columnOrder,
+        defaultSortColumn
+    )
 );
 export const [lastSortDirectionAscending, setLastSortDirectionAscending] = createSignal(
     loadOrDefault<string>("table-sort-direction-ascending", defaultSortDirectionAscending.toString()) === "true"

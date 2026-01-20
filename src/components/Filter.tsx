@@ -2,7 +2,7 @@ import { createSignal, createUniqueId, type JSXElement } from "solid-js";
 import { Portal } from "solid-js/web";
 import { filterSettings, resetFilterSettings, setFilterSettings } from "~/config/filter";
 import { rootElement } from "~/config/rootElement";
-import { columnOrder } from "~/data/orderedColumns";
+import { visibleColumns } from "~/config/visibleColumns";
 import { rows } from "~/data/palCombinedData";
 import filterIcon from "~/icons/filter.svg";
 import { mapCellValue } from "~/utils/mapCellValue";
@@ -65,7 +65,7 @@ export function Filter(): JSXElement {
                                                 const matchingRowIds: string[] = [];
                                                 const searchString = evt.target.value.toLowerCase().trim();
                                                 for (const row of rows()) {
-                                                    const isMatching = columnOrder().some((column) =>
+                                                    const isMatching = visibleColumns().some((column) =>
                                                         mapCellValue(row[column].toString())
                                                             .toLowerCase()
                                                             .includes(searchString)

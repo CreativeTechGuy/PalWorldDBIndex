@@ -7,7 +7,8 @@ import {
     setLastSortDirectionAscending,
     setLastSortedColumn,
 } from "~/config/tableSort";
-import { columnOrder } from "~/data/orderedColumns";
+import { userColumnSettings } from "~/config/userColumns";
+import { visibleColumns } from "~/config/visibleColumns";
 import { rows, setRows } from "~/data/palCombinedData";
 import { arrayIncludes } from "~/utils/arrayIncludes";
 import { mapCellValue } from "~/utils/mapCellValue";
@@ -25,7 +26,7 @@ export function PalTable(): JSXElement {
     onMount(() => {
         // Wait for any display text to get replaced by their respective components
         window.requestAnimationFrame(() => {
-            for (const columnName of columnOrder()) {
+            for (const columnName of userColumnSettings().columnOrder) {
                 for (const row of rows()) {
                     if (mapCellValue(row[columnName].toString()) === "") {
                         continue;
@@ -97,7 +98,7 @@ export function PalTable(): JSXElement {
     return (
         <table class="pal-table">
             <thead>
-                <For each={columnOrder()}>
+                <For each={visibleColumns()}>
                     {(columnName) => (
                         <th
                             class={unsortableColumns.includes(columnName) ? "no-sort" : undefined}
@@ -159,7 +160,7 @@ export function PalTable(): JSXElement {
                                 }
                             }}
                         >
-                            <For each={columnOrder()}>
+                            <For each={visibleColumns()}>
                                 {(columnName) => (
                                     <td>
                                         <CustomField
