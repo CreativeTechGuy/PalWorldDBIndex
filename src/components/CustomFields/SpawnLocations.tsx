@@ -11,12 +11,6 @@ import type { SpawnData, SpawnerData } from "~/types/SpawnLocations";
 import { convertDataTableType } from "~/utils/convertDataTableType";
 import type { CustomFieldProps } from "./customFields";
 
-const cachedMapImg = document.createElement("img");
-cachedMapImg.id = "map-image-cache";
-cachedMapImg.src = mapImg;
-cachedMapImg.style.display = "none";
-document.body.appendChild(cachedMapImg);
-
 const spawnLocationMap = spawnLocationMapUntyped as SpawnData;
 const worldMapScale = worldMapScaleData[0].Rows;
 const raidBossMap = convertDataTableType(raidBossData);
@@ -152,7 +146,7 @@ export function SpawnLocations(props: CustomFieldProps<string>): JSXElement {
                                 )}
                                 <div style={{ position: "relative", margin: "auto", width: "fit-content" }}>
                                     <img
-                                        src={cachedMapImg.src}
+                                        src={mapImg}
                                         style={{
                                             "max-width": "75vw",
                                             "max-height": "75vh",

@@ -26,19 +26,23 @@ export function getPalBlueprint(id: string, sectionName: string): PalBlueprintTy
             `/src/raw_data/Pal/Content/Pal/Blueprint/Character/Monster/PalActorBP/${id.split("_")[0]}/BP_${id}_Normal.json`
         );
     const section = blueprint?.find((item) => item.Name === sectionName);
-    if (section === undefined) {
-        return undefined;
-    }
-    const parentPath = section.Template?.ObjectName.match(/'(.*?)'/)?.[1];
-    const parentFile = parentPath?.split(":")[0].replace("Default__BP_", "").replace(/_C$/, "");
+    const parentFile = blueprint
+        ?.find((item) => item.Type === "BlueprintGeneratedClass")
+        ?.Super?.ObjectName.match(/'(.*?)'/)?.[1]
+        .replace(/(Default__)?BP_/, "")
+        .replace(/_C$/, "");
     if (parentFile === "MonsterBase" || parentFile === undefined) {
         return section;
     }
-    const parentSectionName = parentPath!.split(":")[1];
-    const parentBlueprintSection = getPalBlueprint(parentFile, parentSectionName);
+    const parentBlueprintSection = getPalBlueprint(parentFile, sectionName);
+    if (section === undefined) {
+        return parentBlueprintSection;
+    }
     if (parentBlueprintSection === undefined) {
         return section;
     }
     // @ts-expect-error -- These are the same shape, don't know why it doesn't like it.
-    return deepmerge(parentBlueprintSection, section);
+    return deepmerge(parentBlueprintSection, section, {
+        arrayMerge: (destinationArray, sourceArray: unknown[]) => sourceArray,
+    });
 }

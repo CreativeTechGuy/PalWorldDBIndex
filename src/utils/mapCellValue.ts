@@ -1,3 +1,4 @@
+// cspell:words Regene, Syncro
 import { pascalCaseToTitleCase } from "./pascalCaseToTitleCase";
 
 const map: Record<string, string> = {
@@ -5,6 +6,9 @@ const map: Record<string, string> = {
     Earth: "Ground",
     Leaf: "Grass",
     Normal: "Neutral",
+    ShotAttack: "Attack",
+    Regene: "Regenerate",
+    Syncro: "Synchronize",
 };
 
 export function mapCellValue(value: string): string {
@@ -12,8 +16,8 @@ export function mapCellValue(value: string): string {
     if (value === "None") {
         return "";
     }
-    if (value in map) {
-        return map[value];
+    for (const [source, replacement] of Object.entries(map)) {
+        value = value.replaceAll(source, replacement);
     }
     if (value.match(/^[0-9]+$/) !== null) {
         return parseInt(value, 10).toLocaleString();
