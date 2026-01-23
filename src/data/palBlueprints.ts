@@ -8,6 +8,11 @@ export const palBlueprints: Record<string, PalBlueprintType> = import.meta.glob(
     [
         "~/raw_data/Pal/Content/Pal/Blueprint/Character/Monster/PalActorBP/*/BP_*.json",
         "!~/raw_data/Pal/Content/Pal/Blueprint/Character/Monster/PalActorBP/*/BP_*_BOSS*.json",
+        "!~/raw_data/Pal/Content/Pal/Blueprint/Character/Monster/PalActorBP/*/BP_*_Boss*.json",
+        "!~/raw_data/Pal/Content/Pal/Blueprint/Character/Monster/PalActorBP/*/BP_*_Skin*.json",
+        "!~/raw_data/Pal/Content/Pal/Blueprint/Character/Monster/PalActorBP/*/BP_*_skin*.json",
+        "!~/raw_data/Pal/Content/Pal/Blueprint/Character/Monster/PalActorBP/*/BP_*_GYM*.json",
+        "!~/raw_data/Pal/Content/Pal/Blueprint/Character/Monster/PalActorBP/*/BP_*_RAID*.json",
     ],
     { eager: true, import: "default" }
 );
