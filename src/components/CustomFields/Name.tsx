@@ -8,7 +8,7 @@ import type { CustomFieldProps } from "./customFields";
 // Some of the keys aren't the same case sensitivity as their IDs elsewhere, so normalize the key casing
 const iconMapping = palIconMapping[0].Rows;
 
-export function Name(props: CustomFieldProps<string>): JSXElement {
+export function Name(props: CustomFieldProps<string, { Id: string }>): JSXElement {
     const url = createMemo(() => {
         const iconData = getObjectByCaseInsensitiveKey(iconMapping, props.palData.Id)!;
         const assetPathName = iconData.Icon.AssetPathName.replace("/Game/Pal/Texture/PalIcon/Normal/", "")
@@ -24,8 +24,8 @@ export function Name(props: CustomFieldProps<string>): JSXElement {
             .href;
     });
     return (
-        <Hover label={props.value.trim()}>
-            <img src={url()} alt={`${props.value.trim()} icon`} style={{ width: "150px", height: "150px" }} />
+        <Hover label={props.value} title={props.value}>
+            <img src={url()} alt={`${props.value} icon`} style={{ width: "150px", height: "150px" }} />
         </Hover>
     );
 }

@@ -12,7 +12,6 @@ type DragAndDropListProps<ItemValue> = {
     onChange: (items: Item<ItemValue>[]) => void;
 };
 
-// This doesn't work on mobile because the drag event will scroll the container
 export function DragAndDropList<ItemValue>(props: DragAndDropListProps<ItemValue>): JSXElement {
     return (
         <div style={{ border: "1px solid black", ...props.style }}>
@@ -52,6 +51,7 @@ export function DragAndDropList<ItemValue>(props: DragAndDropListProps<ItemValue
                                 }
                             }}
                             onDrop={(evt) => {
+                                evt.preventDefault();
                                 const movedIndex = parseInt(evt.dataTransfer!.getData("text/plain"), 10);
                                 const newList = [...props.items.filter((_, i) => i !== movedIndex)];
                                 const dropIndex = newList.findIndex((i) => i.value === item.value);

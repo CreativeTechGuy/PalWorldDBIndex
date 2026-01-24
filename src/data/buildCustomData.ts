@@ -1,13 +1,14 @@
 // cspell:words PARTNERSKILL
 import itemNames from "~/raw_data/Pal/Content/L10N/en/Pal/DataTable/Text/DT_ItemNameText_Common.json";
 import palDescriptions from "~/raw_data/Pal/Content/L10N/en/Pal/DataTable/Text/DT_PalFirstActivatedInfoText.json";
-import palNames from "~/raw_data/Pal/Content/L10N/en/Pal/DataTable/Text/DT_PalNameText_Common.json";
 import skillNames from "~/raw_data/Pal/Content/L10N/en/Pal/DataTable/Text/DT_SkillNameText_Common.json";
 import type RidablePalBlueprintType from "~/raw_data/Pal/Content/Pal/Blueprint/Character/Monster/PalActorBP/Serpent/BP_Serpent.json";
 import techUnlocks from "~/raw_data/Pal/Content/Pal/DataTable/Technology/DT_TechnologyRecipeUnlock.json";
 import type { PalMonsterParameter } from "~/types/PalMonsterParameter";
 import { convertDataTableType } from "~/utils/convertDataTableType";
+import { getBreedingParents } from "~/utils/getBreedingParents";
 import { getObjectByCaseInsensitiveKey } from "~/utils/getObjectByCaseInsensitiveKey";
+import { getPalName } from "~/utils/getPalName";
 import { getPalItemDrops } from "./getPalItemDrops";
 import { getPalBlueprint } from "./palBlueprints";
 
@@ -26,11 +27,11 @@ export const customColumns = [
     "HpWithFriendship",
     "AttackWithFriendship",
     "DefenseWithFriendship",
+    "Breeding",
 ] as const;
 
 export type DerivedPalData = Record<(typeof customColumns)[number], string>;
 
-const palNamesMap = convertDataTableType(palNames);
 const descriptionsMap = convertDataTableType(palDescriptions);
 const techUnlockMap = convertDataTableType(techUnlocks);
 const skillNameMap = convertDataTableType(skillNames, { partialData: true });
@@ -38,7 +39,7 @@ const itemNameMap = convertDataTableType(itemNames);
 const maxFriendship = 10;
 
 export function buildCustomData(key: string, palData: PalMonsterParameter): DerivedPalData | null {
-    const palName = getObjectByCaseInsensitiveKey(palNamesMap, `PAL_NAME_${key}`)?.TextData.LocalizedString;
+    const palName = getPalName(key);
     if (palName === undefined) {
         return null;
     }
@@ -108,6 +109,7 @@ export function buildCustomData(key: string, palData: PalMonsterParameter): Deri
                 palData.Friendship_Defense * maxFriendship +
                 palData.Friendship_ShotAttack * maxFriendship
         ).toString(),
+        Breeding: `${getBreedingParents(key).length} combination${getBreedingParents(key).length === 1 ? "" : "s"}`,
         PartnerSkill: skillNameMap[`PARTNERSKILL_${key}`]?.TextData.LocalizedString ?? "",
         PartnerSkillUnlockLevel: partnerSkillUnlockLevel,
         SpawnLocations: "Map",

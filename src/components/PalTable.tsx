@@ -32,7 +32,7 @@ export function PalTable(): JSXElement {
                         continue;
                     } else if (
                         typeof row[columnName] === "number" ||
-                        row[columnName].toString().match(/^[0-9]+$/) !== null ||
+                        row[columnName].toString().match(/^[0-9]+/) !== null ||
                         arrayIncludes(["true", "false"], row[columnName])
                     ) {
                         fieldDefaultSortAscending.set(columnName, false);

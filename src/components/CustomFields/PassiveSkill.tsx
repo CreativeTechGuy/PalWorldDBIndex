@@ -24,7 +24,10 @@ export function PassiveSkill(props: CustomFieldProps<string>): JSXElement {
     return (
         <>
             {`PASSIVE_${props.value}` in skillNameMap ? (
-                <Hover label={skillNameMap[`PASSIVE_${props.value}`].TextData.LocalizedString}>
+                <Hover
+                    label={skillNameMap[`PASSIVE_${props.value}`].TextData.LocalizedString}
+                    title={skillNameMap[`PASSIVE_${props.value}`].TextData.LocalizedString}
+                >
                     {skillDescriptionKey() in skillDescriptionMap ? (
                         <FormatTextTags
                             interpolationData={skillData()}

@@ -30,7 +30,7 @@ export function MinimumSphere(props: CustomFieldProps<string>): JSXElement {
     return (
         <>
             {props.palData.SpawnLocations !== "Raid only" ? (
-                <Hover label={props.value}>
+                <Hover label={props.value} title="Minimum Spheres">
                     <table>
                         <tbody>
                             <tr>

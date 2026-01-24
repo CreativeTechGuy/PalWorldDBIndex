@@ -38,7 +38,7 @@ export function Element(props: CustomFieldProps<string>): JSXElement {
     return (
         <>
             {props.value !== "" && (
-                <Hover label={mapCellValue(props.value)}>
+                <Hover label={mapCellValue(props.value)} title="Pal Elemental Modifiers">
                     {combinedStrengths().length > 0 && (
                         <>
                             <div class="bold">Pal Strong Against</div>

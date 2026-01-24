@@ -150,7 +150,7 @@ export function PartnerSkill(props: CustomFieldProps<string>): JSXElement {
         return data;
     });
     return (
-        <Hover label={props.value}>
+        <Hover label={props.value} title={props.value}>
             {partnerSkillData().length === 0 ? (
                 <FormatTextTags text={props.palData.PalDescription} />
             ) : (

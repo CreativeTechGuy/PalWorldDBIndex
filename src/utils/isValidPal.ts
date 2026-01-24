@@ -1,4 +1,5 @@
 import type { PalMonsterParameter } from "~/types/PalMonsterParameter";
+import { getPalName } from "./getPalName";
 
 const requiredPositiveValues = [
     "SlowWalkSpeed",
@@ -55,6 +56,9 @@ export function isValidPal(palData: PalMonsterParameter): boolean {
         }
     }
     if (!hasWorkSuitability) {
+        return false;
+    }
+    if (getPalName(palData.Tribe.replace("EPalTribeID::", "")) === undefined) {
         return false;
     }
     return true;

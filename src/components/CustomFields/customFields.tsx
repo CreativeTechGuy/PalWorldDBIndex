@@ -1,7 +1,7 @@
 import type { JSXElement } from "solid-js";
 import type { CombinedData } from "~/data/palCombinedData";
+import { Breeding } from "./Breeding";
 import { Element } from "./Element";
-import { IgnoreCombi } from "./IgnoreCombi";
 import { ItemDrops } from "./ItemDrops";
 import { MinimumSphere } from "./MinimumSphere";
 import { Name } from "./Name";
@@ -11,10 +11,10 @@ import { PartnerSkill } from "./PartnerSkill";
 import { PassiveSkill } from "./PassiveSkill";
 import { SpawnLocations } from "./SpawnLocations";
 
-export type CustomFieldProps<Value> = {
+export type CustomFieldProps<Value, PalData = CombinedData> = {
     value: Value;
-    palData: CombinedData;
-    updateData: (newData: CombinedData) => void;
+    palData: PalData;
+    updateData: PalData extends CombinedData ? (newData: CombinedData) => void : undefined;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -34,5 +34,5 @@ export const customFields: Record<string, (props: CustomFieldProps<any>) => JSXE
     BPClass: NoMapCellValue,
     GenusCategory: NoMapCellValue,
     AIResponse: NoMapCellValue,
-    IgnoreCombi,
+    Breeding,
 };

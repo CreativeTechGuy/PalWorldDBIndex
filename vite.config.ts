@@ -2,6 +2,7 @@
 import "dotenv/config";
 import { readFileSync } from "node:fs";
 import { basename, resolve } from "node:path";
+import browserslistToEsbuild from "browserslist-to-esbuild";
 import { defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
 
@@ -92,6 +93,7 @@ export default defineConfig({
         },
     },
     build: {
+        target: browserslistToEsbuild(),
         assetsInlineLimit: 0,
         license: {
             fileName: "license.txt",

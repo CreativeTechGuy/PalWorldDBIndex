@@ -23,6 +23,10 @@
     box-shadow: 1px 1px 5px 2px #000000b3;
 }
 
+.select-none {
+    user-select: none;
+}
+
 .hover-content {
     position: absolute;
     width: max-content;
@@ -34,6 +38,10 @@
     border-radius: 1rem;
     border: 1px solid black;
     box-shadow: 3px 2px 5px 0px #000000b3;
+
+    & .dialog-title {
+        font-size: 1rem;
+    }
 }
 
 .center {
@@ -99,6 +107,11 @@
         fill: #00ff39;
         r: calc(var(--initial-radius) * 2px);
     }
+}
+
+.map-hover > .map-dot {
+    fill: #00ff39;
+    r: calc(var(--initial-radius) * 2px);
 }
 
 .multi-select-list {

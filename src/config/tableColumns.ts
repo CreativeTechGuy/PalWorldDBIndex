@@ -7,6 +7,7 @@ export const defaultColumnOrder: (keyof CombinedData)[] = [
     "ZukanIndex",
     "SpawnLocations",
     "MinimumSphere",
+    "Breeding",
     "Rarity",
     "CombatStatTotal",
     "CombatStatTotalWithFriendship",
@@ -64,6 +65,8 @@ export const defaultHiddenColumns: (keyof CombinedData)[] = [
     "BiologicalGrade",
     "BattleBGM",
     "CombiDuplicatePriority",
+    "CombiRank",
+    "IgnoreCombi",
 ];
 
 export const unsortableColumns: (keyof CombinedData)[] = ["MinimumSphere", "ItemDrops"];

@@ -2,10 +2,12 @@ import { autoPlacement, autoUpdate, computePosition, offset, shift } from "@floa
 import { createEffect, createSignal, onCleanup, type JSXElement } from "solid-js";
 import { Portal } from "solid-js/web";
 import { rootElement } from "~/config/rootElement";
+import closeIcon from "~/icons/close.svg";
 import { noop } from "~/utils/noop";
 
 type HoverProps = {
     label: JSXElement;
+    title?: string;
     children: JSXElement;
     clickOnly?: boolean;
 };
@@ -60,6 +62,17 @@ export function Hover(props: HoverProps): JSXElement {
             {(showHover() === "force" || showHover() === true) && (
                 <Portal mount={rootElement}>
                     <div class="hover-content" ref={popupRef}>
+                        <div class="dialog-header">
+                            <div class="dialog-title">{props.title}</div>
+                            <button
+                                class="link-button"
+                                onClick={() => {
+                                    setShowHover(false);
+                                }}
+                            >
+                                <img src={closeIcon} style={{ width: "1.3rem", height: "1.3rem" }} alt="Close icon" />
+                            </button>
+                        </div>
                         {props.children}
                     </div>
                 </Portal>

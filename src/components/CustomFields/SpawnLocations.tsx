@@ -46,6 +46,7 @@ const dungeonSpawns = Object.entries(convertDataTableType(wildSpawnersData)).red
 export function SpawnLocations(props: CustomFieldProps<string>): JSXElement {
     const [open, setOpen] = createSignal(false);
     const [isDay, setIsDay] = createSignal(true);
+    const [touchHover, setTouchHover] = createSignal(false);
     /* eslint-disable @typescript-eslint/prefer-nullish-coalescing, @typescript-eslint/strict-boolean-expressions */
     const radius = createMemo(
         () =>
@@ -156,7 +157,15 @@ export function SpawnLocations(props: CustomFieldProps<string>): JSXElement {
                                         alt="World map"
                                     />
                                     <svg
-                                        class="map-markers"
+                                        classList={{ "map-markers": true, "map-hover": touchHover() }}
+                                        onTouchStart={() => {
+                                            setTouchHover(true);
+                                            document.body.classList.add("select-none");
+                                        }}
+                                        onTouchEnd={() => {
+                                            setTouchHover(false);
+                                            document.body.classList.remove("select-none");
+                                        }}
                                         viewBox={`${worldMapScale.MainMap.landScapeRealPositionMin.X} ${worldMapScale.MainMap.landScapeRealPositionMin.Y} ${worldMapScale.MainMap.landScapeRealPositionMax.X - worldMapScale.MainMap.landScapeRealPositionMin.X} ${worldMapScale.MainMap.landScapeRealPositionMax.Y - worldMapScale.MainMap.landScapeRealPositionMin.Y}`}
                                     >
                                         <For<{ X: number; Y: number; Radius?: number }[], JSXElement>
