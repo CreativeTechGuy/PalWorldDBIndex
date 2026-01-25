@@ -9,7 +9,6 @@ type HoverProps = {
     label: JSXElement;
     title?: string;
     children: JSXElement;
-    clickOnly?: boolean;
 };
 
 export function Hover(props: HoverProps): JSXElement {
@@ -43,13 +42,19 @@ export function Hover(props: HoverProps): JSXElement {
             <button
                 ref={anchorRef}
                 class="link-button"
-                onMouseEnter={() => {
-                    if (showHover() === false && props.clickOnly !== true) {
+                onPointerEnter={(evt) => {
+                    if (evt.pointerType !== "mouse") {
+                        return;
+                    }
+                    if (showHover() === false) {
                         setShowHover(true);
                     }
                 }}
-                onMouseLeave={() => {
-                    if (showHover() === true && props.clickOnly !== true) {
+                onPointerLeave={(evt) => {
+                    if (evt.pointerType !== "mouse") {
+                        return;
+                    }
+                    if (showHover() === true) {
                         setShowHover(false);
                     }
                 }}
