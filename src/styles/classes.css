@@ -155,3 +155,15 @@ body:has(.dialog-backdrop) {
         padding-left: 0;
     }
 }
+
+.drag-and-drop-list {
+    border: 1px solid black;
+
+    div[draggable] {
+        cursor: move;
+        border-top-width: 2px;
+        border-top-style: solid;
+        border-top-color: transparent;
+        white-space: nowrap;
+    }
+}

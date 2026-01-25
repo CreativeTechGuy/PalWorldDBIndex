@@ -102,7 +102,9 @@ export function PalTable(): JSXElement {
                     <For each={visibleColumns()}>
                         {(columnName) => (
                             <th
-                                class={unsortableColumns.includes(columnName) ? "no-sort" : undefined}
+                                classList={{
+                                    "no-sort": unsortableColumns.includes(columnName),
+                                }}
                                 onClick={() => {
                                     if (unsortableColumns.includes(columnName)) {
                                         return;
@@ -134,7 +136,9 @@ export function PalTable(): JSXElement {
                 <For each={rows()}>
                     {(palData, index) => (
                         <tr
-                            class={filterSettings().highlightedRowIds.includes(palData.Id) ? "highlight" : undefined}
+                            classList={{
+                                highlight: filterSettings().highlightedRowIds.includes(palData.Id),
+                            }}
                             style={{
                                 display:
                                     filterSettings().filterMatchingRowIds?.includes(palData.Id) !== false

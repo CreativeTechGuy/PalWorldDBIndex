@@ -6,7 +6,6 @@ import type RidablePalBlueprintType from "~/raw_data/Pal/Content/Pal/Blueprint/C
 import techUnlocks from "~/raw_data/Pal/Content/Pal/DataTable/Technology/DT_TechnologyRecipeUnlock.json";
 import type { PalMonsterParameter } from "~/types/PalMonsterParameter";
 import { convertDataTableType } from "~/utils/convertDataTableType";
-import { getBreedingParents } from "~/utils/getBreedingParents";
 import { getObjectByCaseInsensitiveKey } from "~/utils/getObjectByCaseInsensitiveKey";
 import { getPalName } from "~/utils/getPalName";
 import { getPalItemDrops } from "./getPalItemDrops";
@@ -109,7 +108,7 @@ export function buildCustomData(key: string, palData: PalMonsterParameter): Deri
                 palData.Friendship_Defense * maxFriendship +
                 palData.Friendship_ShotAttack * maxFriendship
         ).toString(),
-        Breeding: `${getBreedingParents(key).length} combination${getBreedingParents(key).length === 1 ? "" : "s"}`,
+        Breeding: "Combinations",
         PartnerSkill: skillNameMap[`PARTNERSKILL_${key}`]?.TextData.LocalizedString ?? "",
         PartnerSkillUnlockLevel: partnerSkillUnlockLevel,
         SpawnLocations: "Map",

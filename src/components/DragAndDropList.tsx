@@ -14,19 +14,12 @@ type DragAndDropListProps<ItemValue> = {
 
 export function DragAndDropList<ItemValue>(props: DragAndDropListProps<ItemValue>): JSXElement {
     return (
-        <div style={{ border: "1px solid black", ...props.style }}>
+        <div class="drag-and-drop-list" style={props.style}>
             <For each={props.items}>
                 {(item, index) => {
                     return (
                         <div
                             draggable={true}
-                            style={{
-                                cursor: "move",
-                                "border-top-width": "2px",
-                                "border-top-style": "solid",
-                                "border-top-color": "transparent",
-                                "white-space": "nowrap",
-                            }}
                             onDragStart={(evt) => {
                                 evt.dataTransfer!.effectAllowed = "move";
                                 evt.dataTransfer?.setData("text/plain", index().toString());

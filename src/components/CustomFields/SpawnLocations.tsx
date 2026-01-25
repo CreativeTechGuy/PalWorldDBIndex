@@ -123,7 +123,7 @@ export function SpawnLocations(props: CustomFieldProps<string>): JSXElement {
             {!hasNoOverworldSpawns() || dungeonSpawnLocations().length > 0 ? (
                 <>
                     <button onClick={() => setOpen(true)} class="link-button">
-                        {displayText()}
+                        {props.value}
                     </button>
                     {open() && (
                         <Dialog

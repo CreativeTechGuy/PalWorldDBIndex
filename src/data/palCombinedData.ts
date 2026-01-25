@@ -6,22 +6,18 @@ import { buildCustomData, type DerivedPalData } from "./buildCustomData";
 
 export type CombinedData = PalMonsterParameter & DerivedPalData;
 
-export const [rows, setRows] = createSignal<CombinedData[]>([]);
-
+const initialRows: CombinedData[] = [];
 for (const [key, data] of Object.entries(basicPalData[0].Rows)) {
     if (isValidPal(data)) {
         const customData = buildCustomData(key, data);
         if (customData === null) {
             continue;
         }
-        setRows((current) => {
-            return [
-                ...current,
-                {
-                    ...data,
-                    ...customData,
-                },
-            ];
+        initialRows.push({
+            ...data,
+            ...customData,
         });
     }
 }
+
+export const [rows, setRows] = createSignal<CombinedData[]>(initialRows);

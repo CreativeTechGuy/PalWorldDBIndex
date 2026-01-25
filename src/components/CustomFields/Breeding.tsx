@@ -1,4 +1,4 @@
-import { createMemo, For, type JSXElement } from "solid-js";
+import { createMemo, For, onMount, type JSXElement } from "solid-js";
 import { Hover } from "~/components/Hover";
 import { filterSettings } from "~/config/filter";
 import { getBreedingParents } from "~/utils/getBreedingParents";
@@ -30,6 +30,15 @@ export function Breeding(props: CustomFieldProps<string>): JSXElement {
             return highlightScoreB - highlightScoreA;
         });
         return { sortedParents, hasHighlightedParents };
+    });
+    onMount(() => {
+        const newValue = `${parentData().sortedParents.length} combination${parentData().sortedParents.length === 1 ? "" : "s"}`;
+        if (props.value !== newValue) {
+            props.updateData({
+                ...props.palData,
+                Breeding: newValue,
+            });
+        }
     });
     return (
         <Hover
