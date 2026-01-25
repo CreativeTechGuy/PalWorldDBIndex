@@ -1,4 +1,4 @@
-import palCombinationData from "~/raw_data/Pal/Content/Pal/DataTable/Character/DT_PalCombiUnique.json";
+import palExclusiveCombinationData from "~/raw_data/Pal/Content/Pal/DataTable/Character/DT_PalCombiUnique.json";
 import basicPalData from "~/raw_data/Pal/Content/Pal/DataTable/Character/DT_PalMonsterParameter.json";
 import { convertDataTableType } from "./convertDataTableType";
 import { getPalName } from "./getPalName";
@@ -25,24 +25,22 @@ const breedingCombinations: Record<string, BreedingParents[]> = {};
     const palStats: PalStat[] = [];
     const combiRanks: (undefined | PalStat)[] = [];
 
-    const combinations = Object.values(convertDataTableType(palCombinationData));
+    const exclusiveCombinations = Object.values(convertDataTableType(palExclusiveCombinationData));
     const anyGender = "EPalGenderType::None";
     const male = "EPalGenderType::Male";
 
-    for (const combi of combinations) {
+    for (const combi of exclusiveCombinations) {
         const parentA = combi.ParentTribeA.replace("EPalTribeID::", "");
         const parentB = combi.ParentTribeB.replace("EPalTribeID::", "");
-        if (combi.ChildCharacterID !== parentA || combi.ChildCharacterID !== parentB) {
-            breedingCombinations[combi.ChildCharacterID] ??= [];
-            breedingCombinations[combi.ChildCharacterID].push({
-                parentA,
-                parentAName: getPalName(parentA)!,
-                parentB,
-                parentBName: getPalName(parentB)!,
-                ...(combi.ParentGenderA !== anyGender ? { parentAMale: combi.ParentGenderA === male } : {}),
-                ...(combi.ParentGenderB !== anyGender ? { parentBMale: combi.ParentGenderB === male } : {}),
-            });
-        }
+        breedingCombinations[combi.ChildCharacterID] ??= [];
+        breedingCombinations[combi.ChildCharacterID].push({
+            parentA,
+            parentAName: getPalName(parentA)!,
+            parentB,
+            parentBName: getPalName(parentB)!,
+            ...(combi.ParentGenderA !== anyGender ? { parentAMale: combi.ParentGenderA === male } : {}),
+            ...(combi.ParentGenderB !== anyGender ? { parentBMale: combi.ParentGenderB === male } : {}),
+        });
     }
 
     Object.entries(convertDataTableType(basicPalData)).forEach(([id, value]) => {
@@ -54,7 +52,7 @@ const breedingCombinations: Record<string, BreedingParents[]> = {};
                 IgnoreCombi: value.IgnoreCombi,
             };
             palStats.push(obj);
-            if (!value.IgnoreCombi) {
+            if (!value.IgnoreCombi && !(id in breedingCombinations)) {
                 const existingPalInSlot = combiRanks[value.CombiRank];
                 if (existingPalInSlot === undefined) {
                     combiRanks[value.CombiRank] = obj;
@@ -101,7 +99,7 @@ const breedingCombinations: Record<string, BreedingParents[]> = {};
         if (palA.Id === palB.Id) {
             return palA;
         }
-        const childCombiRank = Math.ceil((palA.CombiRank + palB.CombiRank + 1) / 2);
+        const childCombiRank = Math.floor((palA.CombiRank + palB.CombiRank + 1) / 2);
         for (let i = 0; childCombiRank - i >= 0 && childCombiRank + i < combiRanks.length; i++) {
             const potentialChildLow = combiRanks[childCombiRank - i];
             const potentialChildHigh = combiRanks[childCombiRank + i];
